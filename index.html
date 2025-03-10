@@ -11,11 +11,16 @@
     <input type="file" id="fileInput">
     <button onclick="uploadFile()">Upload</button>
 
+    <br><br>
+    <progress id="progressBar" value="0" max="100" style="width: 100%;"></progress>
     <p id="status"></p>
 
     <script>
         function uploadFile() {
             var fileInput = document.getElementById('fileInput');
+            var progressBar = document.getElementById('progressBar');
+            var statusText = document.getElementById('status');
+
             if (fileInput.files.length === 0) {
                 alert("Please select a file to upload.");
                 return;
@@ -28,12 +33,27 @@
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "https://script.google.com/macros/s/AKfycbxL31_dtVJqz66Q6xWt2x0o4HazizokRmR94EAngxKyrXyV489IO1GKg7IBxUxWVRkj/exec", true);
 
+            // ✅ Progress Bar Update
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    var percent = (event.loaded / event.total) * 100;
+                    progressBar.value = percent;
+                }
+            };
+
             xhr.onload = function() {
                 if (xhr.status == 200) {
-                    document.getElementById('status').innerText = "File uploaded successfully!";
+                    statusText.innerText = "File uploaded successfully!";
+                    progressBar.value = 100;
                 } else {
-                    document.getElementById('status').innerText = "Upload failed. Try again.";
+                    statusText.innerText = "Upload failed. Try again.";
+                    progressBar.value = 0;
                 }
+            };
+
+            xhr.onerror = function() {
+                statusText.innerText = "Error occurred while uploading.";
+                progressBar.value = 0;
             };
 
             xhr.send(formData);
