@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
+    <title>Upload File</title>
 </head>
 <body>
-    <h2>Upload File to Google Drive</h2>
+    <h2>Upload a File</h2>
     <form id="uploadForm">
         <input type="file" id="fileInput" required>
         <button type="submit">Upload</button>
@@ -16,30 +14,29 @@
     <script>
         document.getElementById("uploadForm").addEventListener("submit", async function (e) {
             e.preventDefault();
-
+            
             let fileInput = document.getElementById("fileInput").files[0];
             if (!fileInput) {
                 alert("Please select a file!");
                 return;
             }
 
-            let formData = new FormData();
-            formData.append("file", fileInput);
+            let reader = new FileReader();
+            reader.readAsDataURL(fileInput);
+            reader.onload = async function () {
+                let base64Data = reader.result.split(',')[1];
 
-            document.getElementById("status").innerText = "Uploading...";
+                let formData = new FormData();
+                formData.append("file", base64Data);
 
-            try {
-                let response = await fetch("https://script.google.com/macros/s/AKfycbwxF837PxYjNgXhxMchH7ml62tuWuDwH0Sj2APXSd6VikQ1PgMI-CSvw4PVoUtYw8NipA/exec", {
+                let response = await fetch("https://script.google.com/macros/s/AKfycbw71ymVJiJWSDVW0r2cpyv7JgPaBfqVBW8IavgGe7WeoDuNlsyd79nk2cZWWdZZjYFtIg/exec", { // ✅ Replace with your Web App URL after deployment
                     method: "POST",
-                    body: formData,
+                    body: formData
                 });
 
                 let result = await response.text();
                 document.getElementById("status").innerText = result;
-            } catch (error) {
-                document.getElementById("status").innerText = "Upload failed!";
-                console.error("Error:", error);
-            }
+            };
         });
     </script>
 </body>
