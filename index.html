@@ -4,36 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File Upload</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        .progress-container {
-            width: 100%;
-            background-color: #ddd;
-            margin-top: 10px;
-            display: none;
-        }
-        .progress-bar {
-            width: 0%;
-            height: 20px;
-            background-color: #4caf50;
-            text-align: center;
-            color: white;
-        }
-    </style>
 </head>
 <body>
 
     <h2>Upload Your File</h2>
     <input type="file" id="fileInput">
     <button onclick="uploadFile()">Upload</button>
-
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar">0%</div>
-    </div>
 
     <p id="status"></p>
 
@@ -52,24 +28,9 @@
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "https://script.google.com/macros/s/AKfycbyq2B2ImhYoxikS8nzS3PMqCAbW49hB8Jt59g8IT_q9YDHIiVaktJU5Y-C1aTFiWTDASg/exec", true);
 
-            // Show the progress bar
-            document.querySelector('.progress-container').style.display = 'block';
-
-            // Track upload progress
-            xhr.upload.onprogress = function(event) {
-                if (event.lengthComputable) {
-                    var percentComplete = Math.round((event.loaded / event.total) * 100);
-                    var progressBar = document.getElementById('progressBar');
-                    progressBar.style.width = percentComplete + "%";
-                    progressBar.textContent = percentComplete + "%";
-                }
-            };
-
-            // When the upload is complete
             xhr.onload = function() {
                 if (xhr.status == 200) {
                     document.getElementById('status').innerText = "File uploaded successfully!";
-                    document.getElementById('progressBar').style.backgroundColor = "blue";
                 } else {
                     document.getElementById('status').innerText = "Upload failed. Try again.";
                 }
