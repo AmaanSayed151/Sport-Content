@@ -1,57 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Upload Files to Google Drive</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Uploader</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        input { margin: 10px 0; }
-        button { padding: 10px 15px; cursor: pointer; }
+        body { text-align: center; font-family: Arial, sans-serif; padding: 50px; }
+        input, button { margin: 10px; padding: 10px; font-size: 16px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Upload Files</h2>
-        <input type="file" id="fileInput" multiple>
-        <button onclick="uploadFile()">Upload</button>
-        <p id="status"></p>
-    </div>
+    <h2>Upload Files to Google Drive</h2>
+    <input type="file" id="fileInput" multiple>
+    <button onclick="uploadFile()">Upload</button>
+    <p id="status"></p>
 
     <script>
         function uploadFile() {
-            let fileInput = document.getElementById('fileInput');
-            let status = document.getElementById('status');
+            let fileInput = document.getElementById("fileInput");
+            let status = document.getElementById("status");
 
             if (fileInput.files.length === 0) {
                 status.innerText = "Please select a file.";
                 return;
             }
 
-            let file = fileInput.files[0];
-            let reader = new FileReader();
+            let formData = new FormData();
+            formData.append("file", fileInput.files[0]);
 
-            reader.onload = function(event) {
-                let fileData = event.target.result.split(",")[1]; // Get base64 encoded string
-
-                let formData = new FormData();
-                formData.append("file", fileData);
-                formData.append("fileName", file.name);
-                formData.append("mimeType", file.type);
-
-                fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", {  // Replace this
-                    method: "POST",
-                    body: formData
-                })
-                .then(response => response.text())
-                .then(data => {
-                    status.innerText = "Upload successful!";
-                })
-                .catch(error => {
-                    status.innerText = "Upload failed. Try again.";
-                });
-            };
-
-            reader.readAsDataURL(file);
+            fetch("https://script.google.com/macros/s/AKfycbxoWgDIDVirhNXftzpQO-asduCnTkh1UysSCt6i1HgESLdrYxlMECIb582fU4MTZeU7cA/exec", {  // Replace this with your Google Apps Script URL
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                status.innerText = "File uploaded successfully!";
+            })
+            .catch(error => {
+                status.innerText = "Upload failed!";
+            });
         }
     </script>
 </body>
