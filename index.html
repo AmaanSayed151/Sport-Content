@@ -6,45 +6,41 @@
     <title>File Upload</title>
 </head>
 <body>
-
-    <h2>Upload Your File</h2>
-    <input type="file" id="fileInput">
-    <button onclick="uploadFile()">Upload</button>
-
+    <h2>Upload File to Google Drive</h2>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" required>
+        <button type="submit">Upload</button>
+    </form>
     <p id="status"></p>
 
     <script>
-        function uploadFile() {
-            var fileInput = document.getElementById('fileInput');
-            var statusText = document.getElementById('status');
+        document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-            if (fileInput.files.length === 0) {
-                alert("Please select a file to upload.");
+            let fileInput = document.getElementById("fileInput").files[0];
+            if (!fileInput) {
+                alert("Please select a file!");
                 return;
             }
 
-            var file = fileInput.files[0];
-            var formData = new FormData();
-            formData.append("file", file);
+            let formData = new FormData();
+            formData.append("file", fileInput);
 
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "https://script.google.com/macros/s/AKfycbyZfHSw_mxcjq6157NWOLRiygP7MVBlLKct4VmVStFV12sNOpXwzc8nh6AAgJ7k9ZW9jA/exec", true);
+            document.getElementById("status").innerText = "Uploading...";
 
-            xhr.onload = function() {
-                if (xhr.status == 200) {
-                    statusText.innerText = "File uploaded successfully!";
-                } else {
-                    statusText.innerText = "Upload failed. Try again.";
-                }
-            };
+            try {
+                let response = await fetch("https://script.google.com/macros/s/AKfycbwxF837PxYjNgXhxMchH7ml62tuWuDwH0Sj2APXSd6VikQ1PgMI-CSvw4PVoUtYw8NipA/exec", {
+                    method: "POST",
+                    body: formData,
+                });
 
-            xhr.onerror = function() {
-                statusText.innerText = "Error occurred while uploading.";
-            };
-
-            xhr.send(formData);
-        }
+                let result = await response.text();
+                document.getElementById("status").innerText = result;
+            } catch (error) {
+                document.getElementById("status").innerText = "Upload failed!";
+                console.error("Error:", error);
+            }
+        });
     </script>
-
 </body>
 </html>
